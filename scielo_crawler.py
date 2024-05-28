@@ -23,7 +23,13 @@ class SciELOCrawler:
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, 'html.parser')
                     search_results = soup.find_all('div', class_='line')
-                    links = [self.base_url + link.a['href'] for link in search_results if link.a]
+                    links = []
+                    for result in search_results:
+                        a_tag = result.find('a', href=True)
+                        if a_tag:
+                            href = a_tag['href']
+                            if "scielo.php?script=sci_arttext" in href and "scielo.br" in href:
+                                links.append(href)
                     print(f"Found {len(links)} links on {url}")
                     return links
                 else:
@@ -41,10 +47,11 @@ class SciELOCrawler:
                 if response.status_code == 200:
                     html_content = response.content
                     soup = BeautifulSoup(html_content, 'html.parser')
-                    article = soup.find('article', id='articleText')
-                    if article:
-                        texts = [p.get_text() for p in article.find_all('p')]
-                        return '\n'.join(texts)
+                    article_section = soup.find('div', class_='articleSection')
+                    if article_section:
+                        abstract_paragraph = article_section.find('p')
+                        if abstract_paragraph:
+                            return abstract_paragraph.get_text(strip=True)
                 else:
                     print(f"Failed to load page {url} with status code {response.status_code}")
             except Exception as e:
@@ -71,7 +78,7 @@ class SciELOCrawler:
                     self.stop_event.set()
             url_queue.task_done()
 
-    def pipeline(self, max_samples=1000, max_workers=6, max_pages=2):
+    def pipeline(self, max_samples=1000, max_workers=16, max_pages=5):
         search_urls = [self.search_base_url]
         all_articles = []
         url_queue = Queue()
@@ -90,7 +97,7 @@ class SciELOCrawler:
 
 if __name__ == '__main__':
     crawler = SciELOCrawler()
-    data = crawler.pipeline(max_samples=500, max_workers=6, max_pages=2)  # Customize the number of pages as needed
+    data = crawler.pipeline(max_samples=500, max_workers=8, max_pages=8)  # Customize the number of pages as needed
     with open("scielo_data.json", 'w') as f:
         json.dump(data, f, indent=4)
     print("Data has been saved to scielo_data.json.")
