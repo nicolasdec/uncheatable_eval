@@ -198,7 +198,7 @@ class AO3Crawler:
 
 LANGUAGE_MAP = {
     'english': '1',
-    'chinese': 'zh',
+    'portuguese': 'ptBR',
 }
 
 if __name__ == '__main__':
@@ -207,7 +207,7 @@ if __name__ == '__main__':
     parser.add_argument('--start_date', type=str, required=True, help='Start date in the format YYYY-MM-DD')
     parser.add_argument('--end_date', type=str, required=True, help='End date in the format YYYY-MM-DD')
     parser.add_argument('--file_name', type=str, required=True, help='JSON file name')
-    parser.add_argument('--language', type=str, default='english', choices=['english', 'chinese'],
+    parser.add_argument('--language', type=str, default='portuguese', choices=['english', 'portuguese'],
                         help='Programming language to filter the repositories.')
 
     parser.add_argument('--max_works', type=int, default=1000,

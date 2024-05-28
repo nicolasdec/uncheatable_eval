@@ -33,7 +33,7 @@ class WikipediaCrawler:
         while True:
             req = request.copy()
             req.update(last_continue)
-            result = session.get('https://en.wikipedia.org/w/api.php', params=req).json()
+            result = session.get('https://pt.wikipedia.org/w/api.php', params=req).json()
             if 'error' in result:
                 raise Exception(result['error'])
             if 'warnings' in result:
@@ -46,7 +46,7 @@ class WikipediaCrawler:
 
     @staticmethod
     def get_page_content(title, session):
-        url = "https://en.wikipedia.org/w/api.php"
+        url = "https://pt.wikipedia.org/w/api.php"
         params = {
             "action": "parse",
             "page": title,
